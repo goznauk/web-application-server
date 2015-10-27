@@ -32,21 +32,9 @@ public class RequestHandler extends Thread {
 
             String method = requests.get(0).split(" ")[0];
             String url = requests.get(0).split(" ")[1];
-            byte[] requestBody = "body".getBytes();
 
-            if(url.equals("create")) {
-                controller = Dispatcher.getInstance().getCallback(Dispatcher.REQ_API);
-            } else {
-                controller = Dispatcher.getInstance().getCallback(Dispatcher.REQ_FILE);
-            }
-
-            try {
-                controller.execute(url);
-            } catch (FileNotFoundException e) {
-                log.info(e.toString());
-            }
-
-
+            // TODO : change test code
+            byte[] requestBody = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net".getBytes();
 
 
             Dispatcher dispatcher = Dispatcher.getInstance();
@@ -58,54 +46,10 @@ public class RequestHandler extends Thread {
             dos.writeBytes("\r\n");
             dos.flush();
 
-
-            File bodyFile = new File("./webapp" + url);
-
-            if (bodyFile.exists()) {
-                byte[] body = Files.readAllBytes(bodyFile.toPath());
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            } else {
-                byte[] body = "404 Not Found\nPage Does Not Exist".getBytes();
-                response404Header(dos, body.length);
-                responseBody(dos, body);
-            }
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		} catch (CallbackException e) {
-            e.printStackTrace();
-        }
-    }
-
-	private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-		try {
-			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-			dos.writeBytes("\r\n");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-	}
-
-    private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
-	
-	private void responseBody(DataOutputStream dos, byte[] body) {
-		try {
-			dos.write(body, 0, body.length);
-			dos.writeBytes("\r\n");
-			dos.flush();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-	}
 }
